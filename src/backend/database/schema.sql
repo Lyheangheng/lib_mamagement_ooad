@@ -1,0 +1,86 @@
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL CHECK(role IN ('MEMBER', 'LIBRARIAN')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id INTEGER NOT NULL UNIQUE REFERENCES accounts(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    phone TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS members (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    student_id TEXT NOT NULL UNIQUE,
+    faculty TEXT NOT NULL,
+    major TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE', 'SUSPENDED'))
+);
+
+CREATE TABLE IF NOT EXISTS librarians (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    employee_id TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS books (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    isbn TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    author TEXT NOT NULL,
+    publisher TEXT NOT NULL,
+    publication_year INTEGER NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1 CHECK(quantity >= 0)
+);
+
+CREATE TABLE IF NOT EXISTS book_copies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    copy_id TEXT NOT NULL UNIQUE,
+    book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'AVAILABLE' CHECK(status IN ('AVAILABLE', 'BORROWED', 'LOST'))
+);
+
+CREATE TABLE IF NOT EXISTS borrowings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    borrowing_id TEXT NOT NULL UNIQUE,
+    member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE RESTRICT,
+    book_copy_id INTEGER NOT NULL REFERENCES book_copies(id) ON DELETE RESTRICT,
+    borrow_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    due_date DATETIME NOT NULL,
+    return_date DATETIME,
+    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE', 'RETURNED', 'OVERDUE'))
+);
+
+CREATE TABLE IF NOT EXISTS fines (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fine_id TEXT NOT NULL UNIQUE,
+    borrowing_id INTEGER NOT NULL UNIQUE REFERENCES borrowings(id) ON DELETE CASCADE,
+    member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+    overdue_days INTEGER NOT NULL CHECK(overdue_days >= 0),
+    amount REAL NOT NULL CHECK(amount >= 0),
+    status TEXT NOT NULL DEFAULT 'UNPAID' CHECK(status IN ('UNPAID', 'PAID')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS fine_payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    payment_id TEXT NOT NULL UNIQUE,
+    fine_id INTEGER NOT NULL REFERENCES fines(id) ON DELETE CASCADE,
+    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    amount REAL NOT NULL CHECK(amount > 0),
+    librarian_id INTEGER REFERENCES librarians(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_book_copies_book_id ON book_copies(book_id);
+CREATE INDEX IF NOT EXISTS idx_borrowings_member_id ON borrowings(member_id);
+CREATE INDEX IF NOT EXISTS idx_borrowings_book_copy_id ON borrowings(book_copy_id);
+CREATE INDEX IF NOT EXISTS idx_fines_member_id ON fines(member_id);
