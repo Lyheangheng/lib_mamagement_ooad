@@ -32,8 +32,8 @@ export const createBorrowing = async (req: AuthenticatedRequest, res: Response, 
 
 export const processReturn = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const id = Number(req.params.id);
-    const result = await borrowingService.processReturn(id);
+    const ref = req.params.id;
+    const result = await borrowingService.processReturn(ref);
     res.json({ success: true, data: result });
   } catch (err) {
     next(err);
@@ -58,3 +58,49 @@ export const getMemberBorrowings = async (req: AuthenticatedRequest, res: Respon
     next(err);
   }
 };
+
+export const getAllBorrowings = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const search = req.query.search ? String(req.query.search) : undefined;
+    const status = req.query.status ? String(req.query.status) : undefined;
+    const borrowings = await borrowingService.getAllBorrowings(search, status);
+    res.json({ success: true, data: borrowings });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getActiveCopyBorrowing = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const { copyRef } = req.params;
+    const result = await borrowingService.getActiveCopyBorrowing(copyRef);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const borrowBook = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const { bookId, memberId } = req.body;
+    const targetMemberId = memberId || req.user?.memberId;
+
+    if (!targetMemberId) {
+      throw new AppError(400, 'Member ID is required to borrow a book.');
+    }
+
+    if (!bookId) {
+      throw new AppError(400, 'Book ID is required.');
+    }
+
+    if (req.user?.role === 'MEMBER' && req.user.memberId !== targetMemberId) {
+      throw new AppError(403, 'Access denied. Members can only borrow books for themselves.');
+    }
+
+    const borrowing = await borrowingService.borrowBookByBookId(targetMemberId, Number(bookId));
+    res.status(201).json({ success: true, data: borrowing, message: 'Book borrowed successfully!' });
+  } catch (err) {
+    next(err);
+  }
+};
+

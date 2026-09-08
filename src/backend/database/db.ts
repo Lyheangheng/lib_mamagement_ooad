@@ -53,12 +53,22 @@ export const initSchema = async (): Promise<void> => {
   const sql = fs.readFileSync(schemaPath, 'utf-8');
   
   return new Promise((resolve, reject) => {
-    db.exec(sql, (err) => {
+    db.exec(sql, async (err) => {
       if (err) {
         console.error('[DB Error] Schema initialization failed:', err);
         return reject(err);
       }
+      
+      // Auto-migrate missing columns for backward compatibility
+      try {
+        await runQuery('ALTER TABLE books ADD COLUMN cover_image TEXT;').catch(() => {});
+        await runQuery('ALTER TABLE books ADD COLUMN description TEXT;').catch(() => {});
+      } catch (migrationErr) {
+        // Ignored if columns already exist
+      }
+
       resolve();
     });
   });
 };
+

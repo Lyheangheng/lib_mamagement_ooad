@@ -9,6 +9,7 @@ const fineService = new FineService();
 export const getFines = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const status = req.query.status as FineStatus;
+    const search = req.query.search ? String(req.query.search) : undefined;
     let memberId: number | undefined;
 
     if (req.user?.role === 'MEMBER') {
@@ -17,7 +18,7 @@ export const getFines = async (req: AuthenticatedRequest, res: Response, next: N
       memberId = Number(req.query.memberId);
     }
 
-    const fines = await fineService.getFines(status, memberId);
+    const fines = await fineService.getFines(status, memberId, search);
     res.json({ success: true, data: fines });
   } catch (err) {
     next(err);

@@ -4,13 +4,14 @@ import { FineStatus } from '../../domain/Fine';
 export class FineRepository {
   async findById(id: number) {
     return getQuery<any>(
-      `SELECT f.*, m.student_id, u.name as member_name, br.borrowing_id, b.title as book_title
+      `SELECT f.*, m.student_id, u.name as member_name, br.borrowing_id, br.due_date, br.return_date, bc.copy_id, b.title as book_title, fp.payment_date, fp.payment_id
        FROM fines f
        JOIN members m ON f.member_id = m.id
        JOIN users u ON m.user_id = u.id
        JOIN borrowings br ON f.borrowing_id = br.id
        JOIN book_copies bc ON br.book_copy_id = bc.id
        JOIN books b ON bc.book_id = b.id
+       LEFT JOIN fine_payments fp ON f.id = fp.fine_id
        WHERE f.id = ?`,
       [id]
     );
@@ -24,15 +25,16 @@ export class FineRepository {
     return allQuery<any>(`SELECT * FROM fines WHERE member_id = ? AND status = 'UNPAID'`, [memberId]);
   }
 
-  async findAllFines(filterStatus?: FineStatus, memberId?: number) {
+  async findAllFines(filterStatus?: FineStatus, memberId?: number, search?: string) {
     let sql = `
-      SELECT f.*, m.student_id, u.name as member_name, br.borrowing_id, b.title as book_title
+      SELECT f.*, m.student_id, u.name as member_name, br.borrowing_id, br.due_date, br.return_date, bc.copy_id, b.title as book_title, fp.payment_date, fp.payment_id
       FROM fines f
       JOIN members m ON f.member_id = m.id
       JOIN users u ON m.user_id = u.id
       JOIN borrowings br ON f.borrowing_id = br.id
       JOIN book_copies bc ON br.book_copy_id = bc.id
       JOIN books b ON bc.book_id = b.id
+      LEFT JOIN fine_payments fp ON f.id = fp.fine_id
     `;
     const conditions: string[] = [];
     const params: any[] = [];
@@ -45,6 +47,12 @@ export class FineRepository {
     if (memberId) {
       conditions.push(`f.member_id = ?`);
       params.push(memberId);
+    }
+
+    if (search && search.trim() !== '') {
+      const term = `%${search.trim()}%`;
+      conditions.push(`(m.student_id LIKE ? OR u.name LIKE ? OR b.title LIKE ? OR f.fine_id LIKE ? OR br.borrowing_id LIKE ?)`);
+      params.push(term, term, term, term, term);
     }
 
     if (conditions.length > 0) {

@@ -3,19 +3,23 @@ import { ReportRepository } from '../repositories/report.repository';
 export class ReportService {
   private reportRepo = new ReportRepository();
 
-  async getCurrentBorrowingsReport(filterDate?: string, filterMemberId?: number) {
-    return this.reportRepo.getCurrentBorrowingsReport(filterDate, filterMemberId);
+  async getDashboardStats() {
+    return this.reportRepo.getDashboardStats();
   }
 
-  async getOverdueReport() {
-    return this.reportRepo.getOverdueReport();
+  async getCurrentBorrowingsReport(fromDate?: string, toDate?: string, memberSearch?: string, bookSearch?: string, status?: string) {
+    return this.reportRepo.getCurrentBorrowingsReport(fromDate, toDate, memberSearch, bookSearch, status);
   }
 
-  async getUnpaidFinesReport() {
-    return this.reportRepo.getUnpaidFinesReport();
+  async getOverdueReport(memberSearch?: string, bookSearch?: string) {
+    return this.reportRepo.getOverdueReport(memberSearch, bookSearch);
   }
 
-  async getTransactionReport(startDate?: string, endDate?: string, memberId?: number, bookId?: number) {
-    return this.reportRepo.getTransactionReport(startDate, endDate, memberId, bookId);
+  async getUnpaidFinesReport(memberSearch?: string, bookSearch?: string) {
+    return this.reportRepo.getUnpaidFinesReport(memberSearch, bookSearch);
+  }
+
+  async getTransactionReport(startDate?: string, endDate?: string, memberSearch?: string, bookSearch?: string, status?: string) {
+    return this.reportRepo.getTransactionReport(startDate, endDate, memberSearch, bookSearch, status);
   }
 }

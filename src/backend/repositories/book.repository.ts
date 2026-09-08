@@ -44,15 +44,15 @@ export class BookRepository {
     return getQuery<any>(`SELECT * FROM books WHERE isbn = ?`, [isbn]);
   }
 
-  async createBook(data: { isbn: string; title: string; author: string; publisher: string; publicationYear: number; quantity: number }) {
+  async createBook(data: { isbn: string; title: string; author: string; publisher: string; publicationYear: number; quantity: number; coverImage?: string; description?: string }) {
     const result = await runQuery(
-      `INSERT INTO books (isbn, title, author, publisher, publication_year, quantity) VALUES (?, ?, ?, ?, ?, ?)`,
-      [data.isbn, data.title, data.author, data.publisher, data.publicationYear, data.quantity]
+      `INSERT INTO books (isbn, title, author, publisher, publication_year, quantity, cover_image, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.isbn, data.title, data.author, data.publisher, data.publicationYear, data.quantity, data.coverImage || null, data.description || null]
     );
     return result.lastID;
   }
 
-  async updateBook(id: number, data: { isbn?: string; title?: string; author?: string; publisher?: string; publicationYear?: number; quantity?: number }) {
+  async updateBook(id: number, data: { isbn?: string; title?: string; author?: string; publisher?: string; publicationYear?: number; quantity?: number; coverImage?: string; description?: string }) {
     const result = await runQuery(
       `UPDATE books 
        SET isbn = COALESCE(?, isbn),
@@ -60,9 +60,11 @@ export class BookRepository {
            author = COALESCE(?, author),
            publisher = COALESCE(?, publisher),
            publication_year = COALESCE(?, publication_year),
-           quantity = COALESCE(?, quantity)
+           quantity = COALESCE(?, quantity),
+           cover_image = COALESCE(?, cover_image),
+           description = COALESCE(?, description)
        WHERE id = ?`,
-      [data.isbn, data.title, data.author, data.publisher, data.publicationYear, data.quantity, id]
+      [data.isbn, data.title, data.author, data.publisher, data.publicationYear, data.quantity, data.coverImage, data.description, id]
     );
     return result.changes > 0;
   }

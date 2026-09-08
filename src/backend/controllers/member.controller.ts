@@ -70,3 +70,18 @@ export const getMemberBorrowings = async (req: AuthenticatedRequest, res: Respon
     next(err);
   }
 };
+
+export const getMemberBorrowingSummary = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (req.user?.role === 'MEMBER' && req.user.memberId !== id) {
+      throw new AppError(403, 'Access denied. Members can only view their own borrowing summary.');
+    }
+
+    const summary = await memberService.getMemberBorrowingSummary(id);
+    res.json({ success: true, data: summary });
+  } catch (err) {
+    next(err);
+  }
+};

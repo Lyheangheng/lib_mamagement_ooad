@@ -17,7 +17,7 @@ export class BookService {
     return book;
   }
 
-  async createBook(data: { isbn: string; title: string; author: string; publisher: string; publicationYear: number; quantity?: number }) {
+  async createBook(data: { isbn: string; title: string; author: string; publisher: string; publicationYear: number; quantity?: number; coverImage?: string; description?: string }) {
     if (!data.isbn || !data.title || !data.author || !data.publisher || !data.publicationYear) {
       throw new AppError(400, 'ISBN, title, author, publisher, and publicationYear are required.');
     }
@@ -39,7 +39,7 @@ export class BookService {
     return this.getBookById(bookId);
   }
 
-  async updateBook(id: number, data: { isbn?: string; title?: string; author?: string; publisher?: string; publicationYear?: number; quantity?: number }) {
+  async updateBook(id: number, data: { isbn?: string; title?: string; author?: string; publisher?: string; publicationYear?: number; quantity?: number; coverImage?: string; description?: string }) {
     await this.getBookById(id); // Ensure exists
     await this.bookRepo.updateBook(id, data);
     return this.getBookById(id);

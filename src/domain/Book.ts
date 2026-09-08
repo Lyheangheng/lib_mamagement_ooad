@@ -9,10 +9,13 @@ export class Book {
     public publisher: string,
     public publicationYear: number,
     public quantity: number = 1,
-    public copies: BookCopy[] = []
+    public copies: BookCopy[] = [],
+    public coverImage?: string,
+    public description?: string
   ) {}
 
   public getAvailableCopiesCount(): number {
     return this.copies.filter((copy) => copy.isAvailable()).length;
   }
 }
+

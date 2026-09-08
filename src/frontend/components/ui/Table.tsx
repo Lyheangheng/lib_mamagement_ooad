@@ -1,4 +1,5 @@
 import React from 'react';
+import { EmptyState } from './EmptyState';
 
 export interface Column<T = any> {
   key: string;
@@ -10,16 +11,22 @@ export interface TableProps<T = any> {
   columns: Column<T>[];
   data: T[];
   emptyMessage?: string;
+  emptyTitle?: string;
 }
 
-export function Table<T = any>({ columns, data, emptyMessage = 'No data available.' }: TableProps<T>) {
+export function Table<T = any>({
+  columns,
+  data,
+  emptyMessage = 'No matching records available.',
+  emptyTitle = 'No Data Found',
+}: TableProps<T>) {
   return (
-    <div style={{ width: '100%', overflowX: 'auto', borderRadius: '8px', border: '1px solid #374151' }}>
+    <div className="table-responsive-wrapper">
       <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
         <thead>
           <tr style={{ backgroundColor: '#1f2937', borderBottom: '1px solid #374151', color: '#9ca3af' }}>
             {columns.map((col) => (
-              <th key={col.key} style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>
+              <th key={col.key} style={{ padding: '0.75rem 1rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
                 {col.header}
               </th>
             ))}
@@ -28,8 +35,8 @@ export function Table<T = any>({ columns, data, emptyMessage = 'No data availabl
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} style={{ padding: '2rem', textAlign: 'center', color: '#9ca3af' }}>
-                {emptyMessage}
+              <td colSpan={columns.length} style={{ padding: '1rem' }}>
+                <EmptyState title={emptyTitle} description={emptyMessage} />
               </td>
             </tr>
           ) : (
@@ -55,3 +62,4 @@ export function Table<T = any>({ columns, data, emptyMessage = 'No data availabl
     </div>
   );
 }
+

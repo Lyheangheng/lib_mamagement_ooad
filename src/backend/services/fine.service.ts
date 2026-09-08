@@ -5,8 +5,8 @@ import { FineStatus } from '../../domain/Fine';
 export class FineService {
   private fineRepo = new FineRepository();
 
-  async getFines(filterStatus?: FineStatus, memberId?: number) {
-    return this.fineRepo.findAllFines(filterStatus, memberId);
+  async getFines(filterStatus?: FineStatus, memberId?: number, search?: string) {
+    return this.fineRepo.findAllFines(filterStatus, memberId, search);
   }
 
   async getFineById(id: number) {

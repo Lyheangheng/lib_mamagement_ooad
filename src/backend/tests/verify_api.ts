@@ -149,7 +149,7 @@ const runApiVerificationSuite = async () => {
   console.log('  ✅ Overdue Report count:', overdueReport.length);
 
   const unpaidFinesReport = await reportService.getUnpaidFinesReport();
-  console.log('  ✅ Unpaid Fines Report count:', unpaidFinesReport.length);
+  console.log('  ✅ Unpaid Fines Report count:', unpaidFinesReport.totalUnpaidCount);
 
   const txReport = await reportService.getTransactionReport();
   console.log('  ✅ Transaction Report count:', txReport.length);

@@ -39,7 +39,9 @@ CREATE TABLE IF NOT EXISTS books (
     author TEXT NOT NULL,
     publisher TEXT NOT NULL,
     publication_year INTEGER NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1 CHECK(quantity >= 0)
+    quantity INTEGER NOT NULL DEFAULT 1 CHECK(quantity >= 0),
+    cover_image TEXT,
+    description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS book_copies (

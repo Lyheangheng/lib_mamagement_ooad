@@ -11,6 +11,7 @@
     "db:init": "tsx src/backend/database/init_db.ts",
     "db:seed": "tsx src/backend/database/seed.ts",
     "build": "tsc && vite build",
+    "test": "tsx src/backend/tests/run_all_tests.ts",
     "preview": "vite preview"
   },
   "dependencies": {

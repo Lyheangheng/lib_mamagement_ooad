@@ -13,7 +13,7 @@ export const AppContent: React.FC = () => {
 
   return (
     <MainLayout currentPath={currentPath} onNavigate={handleNavigate}>
-      <AppRoutes currentPath={currentPath} />
+      <AppRoutes currentPath={currentPath} onNavigate={handleNavigate} />
     </MainLayout>
   );
 };

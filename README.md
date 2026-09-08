@@ -115,19 +115,63 @@ npm run dev
 
 ## 📊 Current Status & Roadmap
 
-### Current Status: **Phase 1 Complete (Project Analysis & Architecture Setup)**
-Project structure, configuration, TypeScript setup, and architectural placeholders established. No business logic or DB schema initialized.
+### Current Status: **Phase 12 Complete (Final Testing & Deployment Ready)**
+All 12 implementation phases have been completed. All functional requirements (FR1–FR6), business rules (BR1–BR10), security standards, UI/UX polish, data integrity constraints, and automated verification suites have been verified with 100% test pass rate.
 
-### Planned Implementation Phases
+---
 
-1. **Phase 1: Project Analysis & Setup** *(Completed)*
-2. **Phase 2: Database & Data Model**
-3. **Phase 3: Backend & API Foundation**
-4. **Phase 4: Frontend Foundation**
-5. **Phase 5: Authentication & Access Control**
-6. **Phase 6: Book & Member Management**
-7. **Phase 7: Borrowing & Returning Workflow**
-8. **Phase 8: Fine Calculation & Payment Management**
-9. **Phase 9: Reports & Analytics Dashboard**
-10. **Phase 10: Integration & Validation**
-11. **Phase 11: UI/UX Polish & Final Demo Preparation**
+## 🔑 Demo Account Credentials
+
+For university demonstration and testing:
+
+| Role | Username / Student ID | Password | Purpose |
+|---|---|---|---|
+| **Librarian (Admin)** | `librarian_anan` | `LibrarianPass123!` | Book management, member management, issuing loans, processing returns, recording fine payments, generating reports |
+| **Member (Student)** | `6712732101` | `MemberPass123!` | Active member with 1 overdue book & unpaid fine |
+| **Member (Student)** | `6712732102` | `MemberPass123!` | Active member with 2 active loans |
+| **Member (Student)** | `6712732103` | `MemberPass123!` | Active clean member |
+
+---
+
+## 🧪 Testing & Verification
+
+Run the master automated test runner suite:
+
+```bash
+# Execute all 6 test modules in sequence
+npm run test
+```
+
+Individual test suites can also be run:
+- `npx tsx src/backend/tests/verify_auth.ts`
+- `npx tsx src/backend/tests/verify_management.ts`
+- `npx tsx src/backend/tests/verify_borrowing.ts`
+- `npx tsx src/backend/tests/verify_fines.ts`
+- `npx tsx src/backend/tests/verify_reports.ts`
+- `npx tsx src/backend/tests/verify_phase10_e2e.ts`
+
+---
+
+## 🏗️ Production Build & Deployment Guide
+
+### 1. Database Initialization & Seeding
+```bash
+npm run db:init
+npm run db:seed
+```
+
+### 2. TypeScript & Production Bundle Build
+```bash
+npm run build
+```
+
+### 3. Production Execution
+Start the Node/Express backend server:
+```bash
+node --import tsx src/backend/server.ts
+```
+Serve static production frontend files from `dist/` or preview:
+```bash
+npm run preview
+```
+
